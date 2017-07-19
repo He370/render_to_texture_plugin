@@ -1,0 +1,38 @@
+append = {
+
+	global_resources = [
+
+		{ name="camera_buffer" type="render_target" depends_on="back_buffer" w_scale=1 h_scale=1 format="R8G8B8A8" }
+
+	]
+
+	resource_generators = {
+
+		copy_buffer = {
+			modifiers = [
+				{ type="fullscreen_pass" shader="copy" input=["output_target"] output=["camera_buffer"] }
+			]
+		}
+
+	}
+
+	viewports = {
+
+		camera_viewport = {
+			resources = [
+			]
+
+			layer_config = "camera_test"
+			output_rt = "camera_buffer"
+			output_dst = "depth_stencil_target"
+
+		}
+	}
+
+	layer_configs = {
+		camera_test = [
+			{ resource_generator="copy_buffer" }
+		]
+	}
+
+}

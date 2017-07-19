@@ -1,0 +1,168 @@
+/*	@adoc shaders
+	@node Sampling > Sample Texture
+	@sum Reads a color value from a texture for the specified UV coordinates.
+	@in UV: The UV coordinates to sample.
+	@in Mip Level: Specifies which mipmap level to read from the texture. When
+		omitted, this value is determined internally based on the apparent size
+		of the mesh being shaded.
+	@out A linear RGBA value that represents the color value stored in the
+		texture at the specified UV coordinates; or, for normal maps, the
+		normal vector expressed in tangent space.
+	@option Encoding:
+		Specifies the way the color values in the supplied texture are encoded.
+
+		-	`Linear Color`: The texture colors are recorded in linear space.
+		-	`sRGB Color`: The texture colors are recorded using standard RGB values.
+		-	`Normal Map`: The texture is a normal map.
+		-	`RGBM Color`: The texture colors use RGBM encoding. See
+			[this page](http://graphicrants.blogspot.jp/2009/04/rgbm-color-encoding.html)
+			for details.
+	@option Address mode:
+		Determines how the sampler treats UV coordinate values that are outside the
+		normal `[0..1]` range.
+
+		-	`Clamp`: UV coordinate values above `1` are treated as `1`, and values
+			below `0` are treated as `0`. This mode typically results in the sampled
+			texture being applied to the mesh in one place, with the pixels on the edges
+			of the texture being stretched across the rest of the mesh.
+		-	`Wrap`: UV coordinate values above `1` and below `-1` have their integer parts
+			discarded and only their fractional parts used. This typically results in
+			the sampled texture being tiled or wrapped across the surface. This also allows
+			you to place a [Math > Multiply] node before the sample node in order to force
+			the input texture to tile multiple times.
+	@option Filter mode:
+		Determines the process used in order to calculate a single final output color value
+		for the pixel being shaded from the pixels in the texture being sampled.
+
+		-	`Anisotropic`: The best quality filtering method, recommended for most cases.
+		-	`Point`: Computes the pixel in the texture that most closely matches the
+			coordinates of the pixel being shaded, and returns its color. A fast and
+			efficient method, but likely to cause chunky, jagged or blurred results.
+		-	`Linear`: As the *Point* method, but also blends in the colors of the neighboring
+			texture pixels above, below, and to the sides.
+	@option Invert Green Channel:
+		Determines whether or not the sampler inverts the color values of the green channel.
+		Use this setting when you are sampling from a normal map, and the map appears inverted.
+		That is, if areas that should be raised above the surface appear inset into the surface
+		and vice-versa.
+	@des When you select this node in the shader graph, you can use the following
+		options in the Property Editor to configure the properties that can be used
+		to control its value.
+
+		**Display Name**
+		>	The name that will be shown for this texture slot in the Property Editor and in
+		>	the Story Editor.
+		**Slot Name**
+		>	The internal name for this texture slot. No spaces allowed. Use this name when
+		>	you want to change the texture being sampled through Flow or Lua.
+		**UIOrder**
+		>	Determines the order of this texture slot's input widget within the list of
+		>	input variables and sample textures shown in the Property Editor. Variables
+		>	with lower numbers show up toward the top of the Property Editor; variables
+		>	with higher numbers show up lower down.
+*/
+group = "Sampling"
+display_name = "Sample Texture from Buffer"
+inputs = {
+	"1ee9af1f-65f2-4739-ad28-5ea6a0e68fc3" = { name = "texcoord" display_name = "UV" type = "vector2" domain = "pixel" }
+	"aa23e053-3c53-40f7-a06f-23d5d5a65924" = { name = "mip_level" is_required = false display_name = "Mip Level" type = { scalar: ["HAS_MIPLEVEL"] } }
+}
+
+domain = "pixel"
+
+output = {
+	type = "float4"
+}
+
+options = {
+	"acb6ef9d-5ba0-42e4-85f3-2924b4b4be25" = "ADDRESS_CLAMP"
+	"5dd59b3d-1762-4a14-9930-7500230ef3db" = "ADDRESS_WRAP"
+	"f669a3a6-0376-4187-840e-80000e2939d5" = "FILTER_LINEAR"
+	"43dea0e2-a77d-410d-88bb-945dac9139d8" = "FILTER_POINT"
+	"1e067464-12d8-4826-9b72-cfd5765003e3" = "FILTER_ANISOTROPIC"
+	"fb3f709b-a54a-4e93-ac9f-e9fc76fb8bcd" = "SRGB"
+    "90e20826-8689-42fa-8e24-f484ec64c5c3" = "NORMAL_MAP_DECODE"
+    "43710e4f-f52a-4038-8ec8-d6cb0546103b" = "RGBM_DECODE"
+    "e94e53e6-49b6-4194-a747-8f064a5932e0" = "LINEAR"
+    "0268506C-B417-49DC-BBBE-3D5949595940" = "FLIP_GREEN"
+}
+
+ui = [
+	{
+		type = "drop_down"
+		display_name = "Encoding"
+		options = {
+			"Linear Color" = "e94e53e6-49b6-4194-a747-8f064a5932e0"
+			"sRGB Color" = "fb3f709b-a54a-4e93-ac9f-e9fc76fb8bcd"
+			"Normal Map" = "90e20826-8689-42fa-8e24-f484ec64c5c3"
+			"RGBM Color" = "43710e4f-f52a-4038-8ec8-d6cb0546103b"
+		}
+		default = "fb3f709b-a54a-4e93-ac9f-e9fc76fb8bcd"
+	}
+	{
+		type = "drop_down"
+		display_name = "Address mode"
+		options = {
+			"Clamp" = "acb6ef9d-5ba0-42e4-85f3-2924b4b4be25"
+			"Wrap" = "5dd59b3d-1762-4a14-9930-7500230ef3db"
+		}
+		default = "5dd59b3d-1762-4a14-9930-7500230ef3db"
+	}
+	{
+		type = "drop_down"
+		display_name = "Filter mode"
+		options = {
+			"Anisotropic" = "1e067464-12d8-4826-9b72-cfd5765003e3"
+			"Linear" = "f669a3a6-0376-4187-840e-80000e2939d5"
+			"Point" = "43dea0e2-a77d-410d-88bb-945dac9139d8"
+		}
+		default = "1e067464-12d8-4826-9b72-cfd5765003e3"
+	}
+	{ type = "checkbox" display_name = "Invert Green Channel" 					option = "0268506C-B417-49DC-BBBE-3D5949595940" }
+]
+
+code_blocks = {
+	default = {
+		language = "hlsl"
+		samplers = {
+			texture_map = {
+				display_name = "Texture"
+				type = "2d"
+				sampler_state = "core/shader_nodes/graph_common#default_node_sampler"
+				source = "material"
+			}
+			
+			camera_buffer = {
+				sampler_state = "core/stingray_renderer/shader_libraries/common#clamp_point"
+				source = "resource_set"
+				slot_name = "camera_buffer"
+				type = "2d"
+			}
+		}
+
+		code = """
+			float4 result;
+			#if defined(HAS_MIPLEVEL)
+				result = TEX2DLOD(camera_buffer, texcoord, mip_level);
+			#else
+				result = TEX2D(camera_buffer, texcoord);
+			#endif
+
+			#if defined(FLIP_GREEN)
+				result.y = 1.0-result.y;
+			#endif
+
+			#if (defined(RENDERER_GL) || defined(RENDERER_METAL)) && defined(SRGB)
+				result = fast_gamma_to_linear_rgb(result);
+			#endif
+
+			#if defined(NORMAL_MAP_DECODE)
+				result = float4(decode_normal_map(result), result.a);
+			#elif defined(RGBM_DECODE)
+				result = float4(rgbm_decode(result), result.a);
+			#endif
+
+			RESULT(result);
+		"""
+	}
+}

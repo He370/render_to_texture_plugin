@@ -1,0 +1,34 @@
+// About
+//
+name = "Render to Texture Plugin"
+description = "Render to Texture Plugin."
+version = "0.0.1"
+author = {
+    name = "Lindun He"
+    url = "https://git.autodesk.com/t-heli"
+}
+repository = {
+    type = "git"
+    url = "https://git.autodesk.com/t-heli/render_to_texture_plugin"
+}
+keywords = ["texture", "plugin"]
+thumbnail = "thumbnail.png"
+
+// Extensions
+//
+extensions = {
+
+    resources = [
+        {
+            path = "render-to-texture-resources"
+        }
+    ]
+    
+}
+
+// Dependencies
+//
+platforms = ["win64"]
+dependencies = {
+	"stingray" = ">=1.7"
+}

@@ -1,0 +1,7 @@
+render_config_extension = [
+	"render-to-texture-resources/render_to_texture"
+]
+
+lua = [
+	"render-to-texture-resources/VideoCamera"
+]
