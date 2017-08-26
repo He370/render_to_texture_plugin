@@ -14,6 +14,7 @@ function VideoCamera:init(world)
   VideoCamera.camera_unit = stingray.World.spawn_unit(world, SimpleProject.config.camera_unit)
   VideoCamera.camera = stingray.Unit.camera(VideoCamera.camera_unit, 1)
 
+  Application.set_render_setting("taa_enabled", "false")
 end
 
 function VideoCamera:update_camera_pose(pose)
